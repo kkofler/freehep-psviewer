@@ -1,4 +1,7 @@
 /*
+ * Copyright 2001-2009, FreeHEP.
+ * Copyright 2019 DAGOPT Optimization Technologies GmbH, ALL RIGHTS RESERVED.
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -21,7 +24,6 @@ package org.freehep.postscript.device;
 
 import java.awt.Container;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -33,17 +35,20 @@ import org.freehep.postscript.types.PSDevice;
  */
 public class ImageDevice extends PSDevice {
 	private BufferedImage image;
+	private Graphics graphics;
 	private Container container;
 	private AffineTransform deviceTranform = new AffineTransform();
 	
 	public ImageDevice(int width, int height) {
 		image = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
+		graphics = image.getGraphics();
 	}
 	
 	public ImageDevice(Container container, int width, int height) {
 		this.container = container;
 		image = (BufferedImage) container.createImage(width, height);
+		graphics = image.getGraphics();
 	}
 	
 	/* (non-Javadoc)
@@ -51,7 +56,7 @@ public class ImageDevice extends PSDevice {
 	 */
 	@Override
 	public Graphics getDeviceGraphics() {
-		return image.getGraphics();
+		return graphics;
 	}
 
 	/* (non-Javadoc)
@@ -84,11 +89,6 @@ public class ImageDevice extends PSDevice {
 	@Override
 	public void refresh() {
 		// ignored
-	}
-
-	@Override
-	public Graphics2D getGraphics() {
-		return (Graphics2D)image.getGraphics();
 	}
 
 	/* (non-Javadoc)
