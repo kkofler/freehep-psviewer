@@ -1,4 +1,6 @@
 // Copyright 2004-2009, FreeHEP.
+// Copyright 2019 DAGOPT Optimization Technologies GmbH, ALL RIGHTS RESERVED.
+// License: http://freehep.github.io/freehep-psviewer/license.html
 package org.freehep.postscript.dsc;
 
 import java.util.ArrayList;
@@ -429,7 +431,7 @@ public class DSC {
 		
 		public final Object parse(String key, String params, OperandStack os) {
 			try {
-				String[] tokens = params.trim().split("[ \t]", 4);
+				String[] tokens = params.trim().split("[ \t]+", 4);
 				if (tokens.length != 4) {
 					return null;
 				}
