@@ -1,4 +1,6 @@
 // Copyright 2001-2009, FreeHEP.
+// Copyright 2019 DAGOPT Optimization Technologies GmbH, ALL RIGHTS RESERVED.
+// License: http://freehep.github.io/freehep-psviewer/license.html
 package org.freehep.postscript.stacks;
 
 import org.freehep.postscript.dsc.DSC;
@@ -50,6 +52,7 @@ public class OperandStack extends PostScriptStack {
 
 	public void grestore() {
 		gstate = gstateStack().popGState();
+		gstate.apply();
 	}
 
 	public boolean isSecure() {

@@ -1,4 +1,6 @@
 // Copyright 2001-2009, FreeHEP.
+// Copyright 2019 DAGOPT Optimization Technologies GmbH, ALL RIGHTS RESERVED.
+// License: http://freehep.github.io/freehep-psviewer/license.html
 package org.freehep.postscript.types;
 
 import java.awt.BasicStroke;
@@ -35,6 +37,8 @@ import org.freehep.postscript.viewer.FixedTexturePaint;
 public class PSGState extends PSComposite {
 
 	private PSDevice device;
+	private boolean strokeAdjust;
+	private Paint paint;
 	private AffineTransform ctm;
 	private GeneralPath path;
 	private GeneralPath clipPath;
@@ -61,6 +65,8 @@ public class PSGState extends PSComposite {
 		super("gstate", true);
 		this.device = device;
 
+		strokeAdjust = false;
+		paint = null;
 		font = new PSFontDictionary(device.getGraphics().getFont(), dictStack
 				.systemDictionary().getArray(
 						DictionaryStack.standardEncoding.getValue()));
@@ -110,6 +116,8 @@ public class PSGState extends PSComposite {
 
 	public void copyInto(PSGState copy) {
 		copy.device = device;
+		copy.strokeAdjust = strokeAdjust;
+		copy.paint = paint;
 		copy.ctm = (AffineTransform) ctm.clone();
 		copy.path = (GeneralPath) path.clone();
 		copy.clipPath = (clipPath == null) ? null : (GeneralPath) clipPath
@@ -141,6 +149,18 @@ public class PSGState extends PSComposite {
 		PSGState copy = new PSGState();
 		copyInto(copy);
 		return copy;
+	}
+
+	public void apply() {
+		Shape clip = clipPath.createTransformedShape(ctm);
+		device.getGraphics().setClip(clip);
+		device.getGraphics().setRenderingHint(
+				RenderingHints.KEY_STROKE_CONTROL,
+				strokeAdjust ? RenderingHints.VALUE_STROKE_PURE
+					: RenderingHints.VALUE_STROKE_DEFAULT);
+		if (paint != null) {
+			device.getGraphics().setPaint(paint);
+		}
 	}
 
 	private void setStroke() {
@@ -395,9 +415,11 @@ public class PSGState extends PSComposite {
 	}
 
 	public void setStrokeAdjust(boolean adjust) {
+		strokeAdjust = adjust;
 		device.getGraphics().setRenderingHint(
 				RenderingHints.KEY_STROKE_CONTROL,
-				RenderingHints.VALUE_STROKE_PURE);
+				adjust ? RenderingHints.VALUE_STROKE_PURE
+					: RenderingHints.VALUE_STROKE_DEFAULT);
 	}
 
 	public boolean strokeAdjust() {
@@ -536,13 +558,16 @@ public class PSGState extends PSComposite {
 			}
 			paint = ((FixedTexturePaint) paint).inColor(c);
 		}
+		this.paint = paint;
 		device.getGraphics().setPaint(paint);
 	}
 
 	public void setColor(float[] color) {
 		float[] rgb = toRGB(color, colorSpaceName);
 		if (rgb != null) {
-			device.getGraphics().setPaint(new Color(rgb[0], rgb[1], rgb[2]));
+			Color paintColor = new Color(rgb[0], rgb[1], rgb[2]);
+			paint = paintColor;
+			device.getGraphics().setPaint(paintColor);
 		} else {
 			log.warning("Unknown colorspace: " + colorSpaceName);
 		}
