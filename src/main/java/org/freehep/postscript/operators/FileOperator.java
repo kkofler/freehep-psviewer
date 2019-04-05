@@ -1,4 +1,6 @@
 // Copyright 2001-2009, FreeHEP.
+// Copyright 2019 DAGOPT Optimization Technologies GmbH, ALL RIGHTS RESERVED.
+// License: http://freehep.github.io/freehep-psviewer/license.html
 package org.freehep.postscript.operators;
 
 import java.io.File;
@@ -32,6 +34,7 @@ import org.freehep.util.io.ASCII85OutputStream;
 import org.freehep.util.io.ASCIIHexInputStream;
 import org.freehep.util.io.ASCIIHexOutputStream;
 import org.freehep.util.io.DCTInputStream;
+import org.freehep.util.io.DecodingInputStream;
 import org.freehep.util.io.FlateInputStream;
 import org.freehep.util.io.FlateOutputStream;
 import org.freehep.util.io.RunLengthInputStream;
@@ -400,6 +403,15 @@ class ReadString extends FileOperator {
 					} else {
 						string.set(i, b & 0xFF);
 					}
+				}
+				if (file instanceof PSInputFile
+					&& ((PSInputFile) file).getInputStream()
+					instanceof DecodingInputStream) {
+					// discard the rest of the input
+					int discard;
+					do {
+						discard = file.read();
+					} while (discard >= 0);
 				}
 				os.push(string.subString(0));
 				os.push(true);
