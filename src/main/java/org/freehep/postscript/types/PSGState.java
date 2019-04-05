@@ -66,7 +66,7 @@ public class PSGState extends PSComposite {
 		this.device = device;
 
 		strokeAdjust = false;
-		paint = null;
+		paint = device.getGraphics().getPaint();
 		font = new PSFontDictionary(device.getGraphics().getFont(), dictStack
 				.systemDictionary().getArray(
 						DictionaryStack.standardEncoding.getValue()));
@@ -158,9 +158,7 @@ public class PSGState extends PSComposite {
 				RenderingHints.KEY_STROKE_CONTROL,
 				strokeAdjust ? RenderingHints.VALUE_STROKE_PURE
 					: RenderingHints.VALUE_STROKE_DEFAULT);
-		if (paint != null) {
-			device.getGraphics().setPaint(paint);
-		}
+		device.getGraphics().setPaint(paint);
 	}
 
 	private void setStroke() {
